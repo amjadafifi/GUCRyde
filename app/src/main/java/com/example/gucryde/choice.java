@@ -5,29 +5,24 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class choice extends AppCompatActivity {
+
+    private Button riderButton;
+    private Button pickUpButton;
     private Button logoutButton;
     private String email;
     private TextView selectRider;
@@ -35,18 +30,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_choice);
         logoutButton = findViewById(R.id.logOutButton);
-        selectRider = findViewById(R.id.nowRider);
+        riderButton = findViewById(R.id.riderButton);
+        pickUpButton = findViewById(R.id.pickUpButton);
 
-        if(SaveSharedPreference.getUserName(MainActivity.this).length() == 0)
+        if(SaveSharedPreference.getUserName(choice.this).length() == 0)
         {
+            riderButton.setVisibility(View.GONE);
+            pickUpButton.setVisibility(View.GONE);
             selectRider.setVisibility(View.GONE);
             System.out.println(SaveSharedPreference.getUserName(getApplicationContext()));
             Intent i = new Intent(getApplicationContext(),loginActivity.class);
             startActivity(i);
         }
         else {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                email = extras.getString("email");
+            }
+
+            riderButton.setVisibility(View.VISIBLE);
+            pickUpButton.setVisibility(View.VISIBLE);
             logoutButton.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
                     FacebookSdk.sdkInitialize(getApplicationContext());
@@ -57,9 +62,16 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(i);
                 }
             });
+            riderButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View V){
+                    new GetUrlContentTask().execute("http://192.168.0.3/rider.php?rider=1&email=" + email);
+                    finish();
+                    Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                    startActivity(i);
+                }
+            });
 
         }
-
     }
 
     private class GetUrlContentTask extends AsyncTask<String, Integer, String> {
