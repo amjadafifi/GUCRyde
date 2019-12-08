@@ -16,7 +16,7 @@ public class SaveSharedPreference
     {
         SharedPreferences.Editor editor = getSharedPreferences(ctx).edit();
         editor.putString(PREF_USER_NAME, userName);
-        editor.commit();
+         editor.commit();
     }
 
     public static String getUserName(Context ctx)
