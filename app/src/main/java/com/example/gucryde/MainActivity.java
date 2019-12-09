@@ -169,7 +169,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 userName.setText(name);
             }
 
-            
+            logoutButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    FacebookSdk.sdkInitialize(getApplicationContext());
+                    if (AccessToken.getCurrentAccessToken() != null) {
+                        LoginManager.getInstance().logOut();
+                    }
+                    Intent i = new Intent(getApplicationContext(), loginActivity.class);
+                    startActivity(i);
+                }
+            });
 
             pickUpButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
