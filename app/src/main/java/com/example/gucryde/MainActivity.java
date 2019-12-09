@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -184,9 +185,35 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
        getJSON("http://156.192.0.48/riderOptions.php?area=" + area);
 
 
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String mockEmail = "moe@hotmail.com";
+                String o = (String )listView.getItemAtPosition(position);
+                new GetUrlContentTask().execute("http://156.192.0.48/connectRider.php?email=" + mockEmail);
+                getJSON("http://156.192.0.48/riderOptions.php?area=" + area);
+                Toast.makeText(getBaseContext(),"You are now connected to " + toName(o) ,Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
+    public static String toName(String option){
+        String name = "";
+        for (int i = 0; i<option.length();i++){
 
+            if (option.charAt(i) != '-'){
+                name += option.charAt(i);
+            }
+            else {
+                return name;
+            }
+        }
+
+return name;
+    }
     private class GetUrlContentTask extends AsyncTask<String, Integer, String> {
         protected String doInBackground(String... urls) {
             String content = "", line;
@@ -239,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         return false;
     }
+
+
 
 
     @Override
@@ -315,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+
                 try {
                     loadIntoListView(s);
                 } catch (JSONException e) {
@@ -365,6 +394,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         getJSON.execute();
     }
 
+
+
+
     private void loadIntoListView(String json) throws JSONException {
         JSONArray jsonArray = new JSONArray(json);
 
@@ -372,11 +404,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
-            heroes[i] = obj.getString("name") + " "+  obj.getString("address");
+            heroes[i] = obj.getString("name") + " - "+  obj.getString("address");
         }
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, heroes);
 
         listView.setAdapter(arrayAdapter);
+
+
     }
+
+
+
 }
 
