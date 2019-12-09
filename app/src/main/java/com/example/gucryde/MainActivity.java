@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected boolean gps_enabled, network_enabled;
 
     private Button logoutButton;
+    private Button pickUpButton;
     private String email;
     private String name;
     private TextView selectRider;
@@ -94,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
 
             logoutButton = findViewById(R.id.logOutButton);
+            pickUpButton = findViewById(R.id.pickUpButton);
             selectRider = findViewById(R.id.nowRider);
             userName = findViewById(R.id.userNameDisplay);
 
@@ -174,6 +176,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         LoginManager.getInstance().logOut();
                     }
                     Intent i = new Intent(getApplicationContext(), loginActivity.class);
+                    startActivity(i);
+                }
+            });
+
+            pickUpButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                    Intent i = new Intent(getApplicationContext(), pickUpActivity.class);
                     startActivity(i);
                 }
             });
