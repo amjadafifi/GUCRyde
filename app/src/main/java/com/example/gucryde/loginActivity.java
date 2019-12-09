@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -67,62 +68,59 @@ public class loginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         callbackManager = CallbackManager.Factory.create();
-
-                LoginManager.getInstance().registerCallback(callbackManager,
-                        new FacebookCallback<LoginResult>() {
-                            @Override
-                            public void onSuccess(LoginResult loginResult) {
-                                Toast.makeText(getApplicationContext(),"Login successful!",Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                            @Override
-                            public void onCancel() {
-                                Toast.makeText(getApplicationContext(),"Login cancelled!",Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onError(FacebookException exception) {
-                                Toast.makeText(getApplicationContext(),"Login not successful!",Toast.LENGTH_SHORT).show();
-                            }
-                        });
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        final boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-
-
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile","email","user_birthday"));
-       // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("user_birthday"));
-        GraphRequest request = GraphRequest.newMeRequest(
-                accessToken,
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        final String userName;
-                        final String email;
-                        try {
-                            if(isLoggedIn) {
-                                final int age;
-                                userName = (String) object.get("first_name");
-                                age = age(object);
-                                email = (String) object.get("email");
-                                Intent i = new Intent(getApplicationContext(),choice.class);
-                                i.putExtra("email", email);
-                                startActivity(i);
-                                SaveSharedPreference.setUserName(getApplicationContext(), userName);
-                                new GetUrlContentTask().execute("http://192.168.0.3/index.php?user_name=" + userName + "&age=" + age + "&email=" + email);
 
-                            }
-                        } catch(JSONException e) {
-                            e.printStackTrace();
-                        }
 
-                    }
-                });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,birthday, first_name, email");
-        request.setParameters(parameters);
-        request.executeAsync();
-
+        LoginManager.getInstance().registerCallback(callbackManager,
+          new FacebookCallback<LoginResult>() {
+          @Override
+              public void onSuccess(LoginResult loginResult) {
+              Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_SHORT).show();
+              finish();
+              AccessToken accessToken = AccessToken.getCurrentAccessToken();
+              final boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+              // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("user_birthday"));
+              GraphRequest request = GraphRequest.newMeRequest(
+                      accessToken,
+                      new GraphRequest.GraphJSONObjectCallback() {
+                          @Override
+                          public void onCompleted(JSONObject object, GraphResponse response) {
+                              final String userName;
+                              final String email;
+                              final int age;
+                              try {
+                                  if (isLoggedIn) {
+                                      userName = (String) object.get("first_name");
+                                      age = age(object);
+                                      email = (String) object.get("email");
+                                      Intent i = new Intent(getApplicationContext(), choice.class);
+                                      i.putExtra("email", email);
+                                      i.putExtra("name", userName);
+                                      startActivity(i);
+                                      SaveSharedPreference.setUserName(getApplicationContext(), userName);
+                                      new GetUrlContentTask().execute("http://156.192.0.48/index.php?user_name=" + userName + "&age=" + age + "&email=" + email);
+                                  }
+                              } catch (JSONException e) {
+                                  e.printStackTrace();
+                              }
+                          }
+                      });
+              Bundle parameters = new Bundle();
+              parameters.putString("fields", "id,name,birthday, first_name, email");
+              request.setParameters(parameters);
+              request.executeAsync();
+          }
+          @Override
+          public void onCancel() {
+              Toast.makeText(getApplicationContext(),"Login cancelled!",Toast.LENGTH_SHORT).show();
+              LoginManager.getInstance().logOut();
+          }
+          @Override
+          public void onError(FacebookException exception) {
+              Toast.makeText(getApplicationContext(),"Login not successful!",Toast.LENGTH_SHORT).show();
+              LoginManager.getInstance().logOut();
+          }
+        });
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -159,6 +157,15 @@ public class loginActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
         }
+    }
+    @Override
+    public void onBackPressed(){
+        Log.d("CDA", "onBackPressed Called");
+        Intent setIntent = new Intent(Intent.ACTION_MAIN);
+        setIntent.addCategory(Intent.CATEGORY_HOME);
+        setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(setIntent);
+        LoginManager.getInstance().logOut();
     }
 }
 

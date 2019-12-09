@@ -26,6 +26,7 @@ public class choice extends AppCompatActivity {
     private Button logoutButton;
     private String email;
     private TextView selectRider;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,19 +36,11 @@ public class choice extends AppCompatActivity {
         riderButton = findViewById(R.id.riderButton);
         pickUpButton = findViewById(R.id.pickUpButton);
 
-        if(SaveSharedPreference.getUserName(choice.this).length() == 0)
-        {
-            riderButton.setVisibility(View.GONE);
-            pickUpButton.setVisibility(View.GONE);
-            selectRider.setVisibility(View.GONE);
-            System.out.println(SaveSharedPreference.getUserName(getApplicationContext()));
-            Intent i = new Intent(getApplicationContext(),loginActivity.class);
-            startActivity(i);
-        }
-        else {
+
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 email = extras.getString("email");
+                name = extras.getString("name");
             }
 
             riderButton.setVisibility(View.VISIBLE);
@@ -58,21 +51,24 @@ public class choice extends AppCompatActivity {
                     if(AccessToken.getCurrentAccessToken() != null) {
                         LoginManager.getInstance().logOut();
                     }
+                    finish();
                     Intent i = new Intent(getApplicationContext(),loginActivity.class);
                     startActivity(i);
                 }
             });
             riderButton.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View V){
-                    new GetUrlContentTask().execute("http://192.168.0.3/rider.php?rider=1&email=" + email);
+                    new GetUrlContentTask().execute("http://156.192.0.48/rider.php?rider=1&email=" + email);
                     finish();
                     Intent i = new Intent(getApplicationContext(),MainActivity.class);
+                    i.putExtra("name",name);
+                    i.putExtra("email", email);
                     startActivity(i);
                 }
             });
 
         }
-    }
+
 
     private class GetUrlContentTask extends AsyncTask<String, Integer, String> {
         protected String doInBackground(String... urls) {
@@ -103,5 +99,11 @@ public class choice extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
         }
+    }
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+        finish();
+
     }
 }
