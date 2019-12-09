@@ -356,9 +356,6 @@ return name;
             //in this method we are fetching the json string
             @Override
             protected String doInBackground(Void... voids) {
-
-
-
                 try {
                     //creating a URL
                     URL url = new URL(urlWebService);
