@@ -66,6 +66,13 @@ public class choice extends AppCompatActivity {
                     startActivity(i);
                 }
             });
+            pickUpButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                    Intent i = new Intent(getApplicationContext(), pickUpActivity.class);
+                    startActivity(i);
+                }
+            });
 
         }
 

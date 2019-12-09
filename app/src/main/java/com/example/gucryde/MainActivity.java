@@ -180,14 +180,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 }
             });
 
-            pickUpButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    finish();
-                    Intent i = new Intent(getApplicationContext(), pickUpActivity.class);
-                    startActivity(i);
-                }
-            });
-
         }
         new GetUrlContentTask().execute("http://156.192.0.48/riderOptions.php?area=" + area);
        // getJSON("http://192.168.31.203/webcheerz/api.php");
